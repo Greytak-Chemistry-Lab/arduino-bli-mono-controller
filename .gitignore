@@ -1,0 +1,140 @@
+# The .gitignore for our instrument repo template will have 3 parts:
+# 1. MATLAB stuff   
+# 2. Office stuff  
+# 3. C++ stuff (possibly useful re: Arduino, 
+#    though we've commented out .exe to allow redistribution of compiled 
+#    MATLAB GUIs 
+# =======================================================================
+# 1. MATLAB and Simulink Git Ignore Template (from Github via Google Gemini)
+# =======================================================================
+
+# Autosave and Backup Files
+*.asv
+*.m~
+*.autosave
+*.bak
+
+# Simulink Backup & Autosave
+*.slx.r*
+*.mdl.r*
+*.slx.original
+*.mdl.original
+
+# Compiled MEX binaries (All platforms)
+*.mex*
+
+# Packaged App and Toolbox Files
+*.mlappinstall
+*.mltbx
+
+# Deployable Archives (MATLAB Compiler)
+*.ctf
+
+# Generated Documentation Search Folders
+helpsearch*/
+
+# Code Generation Folders (Simulink Coder / MATLAB Coder)
+slprj/
+sccprj/
+codegen/
+
+# Cache and Workspace Files
+*.slxc
+*.mexw64
+*.mexa64
+*.mexmaci64
+octave-workspace
+
+# Cloud Storage Tags
+.MATLABDriveTag
+
+# =======================================================================
+# 2. Microsoft Office autosave and lock files (suggested by Google Gemini)
+# =======================================================================
+
+# Microsoft Word lock files
+~$*.docx
+~$*.doc
+
+# Microsoft Excel lock files
+~$*.xlsx
+~$*.xls
+
+# Microsoft PowerPoint lock files
+~$*.pptx
+~$*.ppt
+
+
+# =======================================================================
+# 3. From Github C++ .gitignore template
+# =======================================================================
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Linker files
+*.ilk
+
+# Debugger Files
+*.pdb
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+*.so.*
+
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables -- commented out .exe to permit redistribution of MATLAB GUIs 
+# *.exe
+*.out
+*.app
+
+# Build directories
+build/
+Build/
+build-*/
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+install_manifest.txt
+compile_commands.json
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+*.swp
+
+# vcpkg
+vcpkg_installed/
+
+# debug information files
+*.dwo
+
+# test output & cache
+Testing/
+.cache/

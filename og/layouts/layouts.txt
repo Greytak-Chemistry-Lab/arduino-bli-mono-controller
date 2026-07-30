@@ -1,0 +1,5 @@
+Layouts for your instrument can go here. This includes structural drawings, electronic schematic diagrams or assembly diagrams, or flow charts for software development.
+
+- You should include a parts list, including supplier and part number
+- Could have subfolders for different sub-assemblies, for minor variations in design, or for 
+  peripheral accessories that can be used with the core design

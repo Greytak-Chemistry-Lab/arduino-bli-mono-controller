@@ -1,0 +1,5 @@
+Programs that can be used to operate your instrument, or to interpret data that it produces, can be placed here.
+
+- You can have subfolders for different programs that can run on the same hardware
+- Remember that Arduino sketches need to live in a subfolder where the folder name and `.ino` 
+  file name are the same
