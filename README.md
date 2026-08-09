@@ -1,42 +1,38 @@
-# instrument-template
-A template for repos housing layouts (design, parts lists), code, and other resources for home-built instrumentation
+# arduino monochromator controller
+This repository is for an Arduino-based automation controller for an Optical Building Blocks (OBB) monochromator in the Greytak lab at the University of South Carolina. This monochromator was originally a manually-operated model and has been enhanced with a NEMA-17 bipolar stepper motor, driven by a DRV8825 stepper motor controller mounted on an Arduino shield. A single limit switch completes the electronic design. 
+
+This project is an implementation of the "Arduino Basic Laboratory Instrument" described in our `arduino-BLI` repository, and uses an Arduino Uno R3 microcontroller with peripheral button/LED and 16x2 LCD display boards.
 
 Developed by the Greytak lab at the University of South Carolina. Copyright Andrew B. Greytak 2026.
 
 For more information about our laboratory see the Greytak Chemisty Lab's [GitHub Pages site](https://greytak-chemistry-lab.github.io), or our group website.
 
-
-# Readme template
-
-You should modify this repo to offer some description of your project.
-
 ## Purpose and overview of project
 
-Indicate what this project is for, who made it, and the stage of development (is it in use? in progress? a demo or hack? a pipe dream for the future?). Provide links to any associated papers or webpages.
+These notes are incomplete and should be improved over time.
 
-## What information your repository should provide
+Configuration information:
+- Some instrument-specific parameters including micro-stepping configuration for the stepper motor drives (i.e., whether it will simulate a larger number of steps per revolution), steps-to-wavelength calibration, and home position are specified in the Arduino sketch.
+- On startup, the program will ask if homing is necessary (it will be if the instrument was powered off in position other than home).
 
-For any hardware project, you will ideally include:
+After startup, the program operates in two modes, selected by the mode toggle switch.
+- In **manual** mode, the user can specify a desired target wavelength and a speed. The stepper motor will then move the grating to the desired position.
+- In **auto** mode, the user will specify parameters for the starting wavelength, ending wavelength, speed, and number of replicates for a desired wavelength scan.
+	- After setting these parameters, `Start/Next` will begin the scan. `Start/Next` normally uses a pushbutton input, but could be triggered by an active-low external signal. The LED is activated at the start of each sweep, and could be used to trigger an external recording device.
+	- Pressing `Stop/Reset` will pause the scan. Holding it down will enable reset. See program comments for more info on error handling, for which this project is a good example.
+	- At the conclusion of the desired replicates, the program will await the next `Start/Next` signal to repeat. Toggling to manual mode can enable re-entry of auto scan parameters.
+	
 
-- A parts list
-- Drawings and/or schematic diagrams for how to put it together (including electronic and structural aspects)
-- If it uses software (on a microcontroller, or via a PC connection), the code and/or executable files you need to run it. Along with the code, be sure to indicate what hardware/operating system it was tested on.
-- Some pictures of the assembled item or examples of it working.
-- Operating instructions 
-- Any resources that were especially useful to you in designing it, or links to these resources.
-- If multiple variations are present in the repo, you should describe what's different about them and which is the most recent in this README.
-
-Your readme can indicate where to find these things. The operating instructions and resources could simply appear in this README or in the README for one of the variations.
-
-## Suggested project organization (to be replicated in each variation-version):
+## Repository organization (replicated in each variation-version):
 
 - **`layouts`**: folder with description of hardware
     - Should include parts list(s) and diagrams
 	- Could have subfolders for different sub-assemblies, or for minor variations in design or accessories
-- **`programs`** or **`sketches`**: Software
+- **`programs`**: Software
 	- Can have subfolders for different programs that can run on the same hardware
 	- Remember that Arduino sketches need to live in a subfolder where the folder name and `.ino` file name are the same
-- **`examples`**
+- **`calibration results`**: Instrument specific data
+	- used to select parameters needed for programs
 
 
 ## Our approach to git repositories: variations and versions
@@ -51,3 +47,13 @@ Each repo will have one or more maintainers who are able to commit changes. The 
 
 Folders will be named (within the repo) as: "variation-version" or just "variation" for the current version of each variation.
 
+Presently, only the `og` variation exists for this `arduino-bli-mono-controller` project, and it is designed to operate the mono with an infrared grating. Calibration information in the `og` variation folders applies to this implementation.
+
+## Attribution and license:
+> This is a project of the Greytak Chemistry Lab – `github.com/greytak-chemistry-lab/arduino-bli-mono-controller`
+>
+> Copyright Andrew B Greytak with applicable rights reserved by the University of South Carolina. Email: `greytak@sc.edu`.
+> - Code shared via GNU Public License (GPL v3)
+> - Layouts / Resources shared via CC-BY-SA-4.0
+>
+> See LICENSE file for details

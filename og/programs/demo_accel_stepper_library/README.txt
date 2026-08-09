@@ -1,0 +1,1 @@
+I used Accel Stepper library functions to control speed, acceleration, direction etc. The only issue is the motor and driver become hot quickly.
