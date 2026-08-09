@@ -1,7 +1,7 @@
 # arduino monochromator controller
-This repository is for an Arduino-based automation controller for an Optical Building Blocks (OBB) monochromator in the Greytak lab at the University of South Carolina. This monochromator was originally a manually-operated model and has been enhanced with a NEMA-17 bipolar stepper motor, driven by a DRV8825 stepper motor controller mounted on an Arduino shield. A single limit switch completes the electronic design. 
+This repository is for an Arduino-based automation controller for an Optical Building Blocks (OBB) monochromator in the Greytak lab at the University of South Carolina. This monochromator was originally a manually-operated model and has been enhanced with a NEMA-17 bipolar stepper motor, driven by a DRV8825 stepper motor controller mounted on an Arduino shield. A toggle switch for mode, and a single limit switch, complete the electronic design. 
 
-This project is an implementation of the "Arduino Basic Laboratory Instrument" described in our `arduino-BLI` repository, and uses an Arduino Uno R3 microcontroller with peripheral button/LED and 16x2 LCD display boards.
+This project is an implementation of the "Arduino Basic Laboratory Instrument" described in our `arduino-bli` repository, and uses an Arduino Uno R3 microcontroller with peripheral button/LED and 16x2 LCD display boards.
 
 Developed by the Greytak lab at the University of South Carolina. Copyright Andrew B. Greytak 2026.
 
