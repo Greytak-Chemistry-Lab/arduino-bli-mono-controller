@@ -78,8 +78,8 @@ const long steps_Max = long(8.75 * stepsPerRevolution);  // SET APPROPRIATELY TO
 // ******** ADJUST HERE FOR INSTRUMENT-SPECIFIC CALIBRATION ***************
 // Polynomial constants to convert nm position to steps, from calibration
 float c0 = 0;
-// change c1 to -8 since increasing steps leads to shorter wavelength position
-float c1 = -16;  // AS: 16 steps per nm. 80 steps per second. So 5 nm/s scanning
+// change c1 to -16 since increasing steps leads to shorter wavelength position
+float c1 = -16;  // visible: 16 steps per nm. 80 steps per second. So 5 nm/s scanning
 float c2 = 0;
 float c3 = 0;
 
@@ -221,7 +221,7 @@ void homeMotor() {
   digitalWrite(dirPin, COUNTERCLOCKWISE);                                              // Set motor direction to backward
   while (digitalRead(limit1Pin) == HIGH && digitalRead(stopresetButtonPin) == HIGH) {  // Keep moving until limit switch is triggered
     digitalWrite(stepPin, HIGH);                                                       // Step pulse
-    delayMicroseconds(stepInterval);                                                   // Control speed
+    delayMicroseconds(stepInterval);                                                   // Control speed 
     digitalWrite(stepPin, LOW);
     delayMicroseconds(stepInterval);
   }
@@ -429,7 +429,7 @@ void loop() {
         if(millis() - button_time > INITDELAY) {
           button_speed=button_speed_factor;
         }
-        position_target += button_speed*position_incr;  // Increase by 10 nm
+        position_target += button_speed*position_incr;  // Increase 
         // check if this will be a problem
         if (position_target > position_Max || positionSteps(position_target) < steps_Min) {
           position_target -= button_speed*position_incr;  // if a problem, undo change
@@ -448,7 +448,7 @@ void loop() {
         if(millis() - button_time > INITDELAY) {
           button_speed=button_speed_factor;
         }
-        position_target -= button_speed*position_incr;  // Decrease by 10 nm
+        position_target -= button_speed*position_incr;  // Decrease 
         // check if this will be a problem
         if (position_target < position_Min || positionSteps(position_target) > steps_Max) {
           position_target += button_speed*position_incr;  // if a problem, undo change
