@@ -66,7 +66,7 @@ const long stepsPerRevolution = 1600;  // 1/8 microstepping
 unsigned long stepInterval = 6250;  // 6250 microseconds for 80 steps per second
 const long backlashSteps = 10;
 const long steps_Min = backlashSteps;
-const long steps_Max = 8 * stepsPerRevolution;  // SET APPROPRIATELY TO AVOID CRASH
+const long steps_Max = long(8.75 * stepsPerRevolution);  // SET APPROPRIATELY TO AVOID CRASH
 
 // Direction definitions
 // With our setup, CLOCKWISE moves FORWARD (away from limit1 switch)
