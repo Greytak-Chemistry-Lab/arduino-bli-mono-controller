@@ -1,10 +1,11 @@
 // select instrument
-#define VIS
-// #define NIR
+//#define VIS
+#define NIR
 
 // ******** ADJUST HERE FOR INSTRUMENT-SPECIFIC CALIBRATION ***************
 #ifdef VIS
 
+#define INSTRTYPE "Vis-local"
 // Polynomial constants to convert nm position to steps, from calibration
 #define C0  0
 // change c1 to -16 since increasing steps leads to shorter wavelength position
@@ -37,6 +38,8 @@
 
 #ifdef NIR
 
+#define INSTRTYPE "NIR-local"
+
 // Polynomial constants to convert nm position to steps, from calibration
 #define C0  0
 // change c1 to -16 since increasing steps leads to shorter wavelength position
@@ -53,10 +56,10 @@
 #define SPEEDMAX 600 // Speed max, nm/min, max=420 for stepInterval=4000
 #define SPEEDINCR 60 // scan speeds multiple of 60 nm/min
 //long autoscan_speed=0; //initialize autoscan speed 
-#define COARSEBUTTONINCR 10 // for faster scrolling (manual) and setting auto endpoints
+#define COARSEBUTTONINCR 1 // for faster scrolling (manual) and setting auto endpoints
 
 // Wavelength configuration and counters
-#define STEPSOFFSET 1328   // Offset after homing
+#define STEPSOFFSET 1440   // Offset after homing
 //long stepCounter = 0;            // Tracks current step position from home
 #define STARTPOSITION 1990  // Start position in nm (green mercury line)
 //long position;                   // current position in nm

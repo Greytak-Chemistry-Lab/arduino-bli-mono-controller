@@ -189,6 +189,7 @@ lcd.setCursor(0,0);
 lcd.print("Resetval:");
 lcd.print(resetval);
 delay(STARTDELAY);
+lcd.clear();
 return resetval;
 }
 
@@ -260,7 +261,9 @@ void setup() {
   lcd.begin(16, 2);
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("MonoVIS: og");
+  lcd.print(INSTRTYPE);
+  lcd.setCursor(0, 1);
+  lcd.print("BLI-mono: og");
   delay(INITDELAY);
 
   pinMode(upButtonPin, INPUT_PULLUP);
@@ -654,6 +657,7 @@ void loop() {
     //lcd.print(autoscan_Speed);
     //lcd.print(" nm/min");
     lcd.write(" ");
+    delay(STARTDELAY); // waiting to make sure previous "start/next" button press has cleared
 
     do { // auto mode speed selection loop
       lcd.setCursor(6,0);
@@ -689,10 +693,12 @@ void loop() {
     //lcd.print(autoscan_Speed);
     //lcd.print(" nm/min");
     lcd.write(" ");
+    delay(STARTDELAY); // waiting to make sure previous "start/next" button press has cleared
 
     do { // auto mode cycles selection loop
       lcd.setCursor(12,0);
       lcd.print(autoscan_Cycles);
+      lcd.write(" ");
       delay(HOLDOFF);
       
       // adjust speed with up and down buttons
@@ -870,4 +876,5 @@ void loop() {
   }
   resetval=0; // clear errors
   delay(STARTDELAY);
+  lcd.clear();
 } // close loop()
