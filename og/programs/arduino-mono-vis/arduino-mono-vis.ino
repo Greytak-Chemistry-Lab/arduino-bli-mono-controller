@@ -41,7 +41,7 @@ const int downButtonPin = 15;
 const int startnextButtonPin = 16;
 const int stopresetButtonPin = 17;
 const int limit1Pin = 18;
-const int autoManualPin = 19;  // LOW (switch closed) = auto
+const int manualModePin = 19;  // LOW (switch closed) = auto
 
 const int HOLDOFF = 150;     // milliseconds after button press before we read again
 const int INITDELAY = 2000;  // delay on setup()
@@ -54,7 +54,7 @@ const int ledPin = LED_BUILTIN;
 // Motor control and microstepping pins
 const int dirPin = 8;
 const int stepPin = 9;
-//  changed microstepping pins to 10,11,12 so 13 is available for LED
+//  microstepping pins 
 const int M0 = 10;
 const int M1 = 11;
 const int M2 = 12;
@@ -63,7 +63,7 @@ const int M2 = 12;
 const long stepsPerRevolution = 1600;  // 1/8 microstepping
 // Each step takes at least 2*stepInterval microseconds
 // stepInterval in us: 1000000 / (2*nm_per_min*8/60) with c1=(-)8
-unsigned long stepInterval = 6250;  // 6250 microseconds for 80 steps per second
+unsigned long stepInterval = 4000;  // 4000 microseconds half-period for 125 steps per second
 const long backlashSteps = 10;
 const long steps_Min = backlashSteps;
 const long steps_Max = long(8.75 * stepsPerRevolution);  // SET APPROPRIATELY TO AVOID CRASH
@@ -79,7 +79,7 @@ const long steps_Max = long(8.75 * stepsPerRevolution);  // SET APPROPRIATELY TO
 // Polynomial constants to convert nm position to steps, from calibration
 float c0 = 0;
 // change c1 to -16 since increasing steps leads to shorter wavelength position
-float c1 = -16;  // visible: 16 steps per nm. 80 steps per second. So 5 nm/s scanning
+float c1 = -16;  // visible: 16 steps per nm. 125 steps per second. So 7.8125 nm/s scanning
 float c2 = 0;
 float c3 = 0;
 
@@ -100,11 +100,11 @@ bool isHomed = false;      // flag to indicate homing is not done yet
 // speed selection
 long speed_nm_min=0; // selected speed in nm/min
 long slow_us=0;   // delay based on speed
-const long speed_Min=300; // minimum speed, nm/min: slower than 300 incompatible with current delay scheme
-const long speed_Max=600; // Speed max, nm/min, max=600 for stepInterval=6250
+const long speed_Min=240; // minimum speed, nm/min: slower than 240 incompatible with current delay scheme
+const long speed_Max=420; // Speed max, nm/min, max=420 for stepInterval=4000
 const long speed_incr=60; // multiple of 60
 long autoscan_speed=0; //initialize autoscan speed 
-const int button_speed_factor=10; // for faster scrolling when button held down
+const int coarse_button_incr=10; // for faster scrolling when button held down
 
 
 // Initialize LCD
@@ -264,7 +264,7 @@ void setup() {
   pinMode(startnextButtonPin, INPUT_PULLUP);
   pinMode(stopresetButtonPin, INPUT_PULLUP);
   pinMode(limit1Pin, INPUT_PULLUP);
-  pinMode(autoManualPin, INPUT_PULLUP);
+  pinMode(manualModePin, INPUT_PULLUP);
 
   pinMode(dirPin, OUTPUT);
   pinMode(stepPin, OUTPUT);
@@ -327,7 +327,7 @@ void setup() {
 
 void loop() {
   // the following boolean flags are 1 if true, even if representing active-low signal
-  bool upButton, downButton, startnextButton, stopresetButton, limit1, autoManual;
+  bool upButton, downButton, startnextButton, stopresetButton, limit1, manualMode;
   long position_target, button_time;
   long steps_target;
   int cycles_completed=0, button_speed;
@@ -342,8 +342,8 @@ void loop() {
     hardReset=false;
   }
 
-  autoManual=!digitalRead(autoManualPin); // autoManual is true (switch closed) for manual mode
-  if (autoManual == true) {  // Manual mode
+  manualMode=!digitalRead(manualModePin); // manualMode is true (switch closed) for manual mode
+  if (manualMode == true) {  // Manual mode
     // speed selection for manual mode
     if(speed_nm_min==0) { // Manual speed has not been set, or a reset was commanded
       speed_nm_min=speed_Max;
@@ -351,7 +351,7 @@ void loop() {
       lcd.setCursor(0,0);
       lcd.print("Speed: ");
       // lcd.print(" nm/min");
-      while( autoManual == true && digitalRead(startnextButtonPin)==HIGH ) {
+      while( manualMode == true && digitalRead(startnextButtonPin)==HIGH ) {
         if (digitalRead(upButtonPin)==LOW){
           speed_nm_min +=speed_incr;//increase speed
           if(speed_nm_min>speed_Max){
@@ -371,7 +371,7 @@ void loop() {
         lcd.write(" ");
         delay(HOLDOFF);
         // Check for mode change
-        autoManual = !digitalRead(autoManualPin);
+        manualMode = !digitalRead(manualModePin);
         // Check for reset
         if(digitalRead(stopresetButtonPin) == LOW) 
           resetval=resetHandler(stopresetButtonPin);
@@ -398,6 +398,7 @@ void loop() {
     button_time=0;
     upButton=0;
     downButton=0;
+    button_speed=1;
 
     position_target = positionRound(position) ; // Start manual mode from our current position
     lcd.clear();
@@ -413,7 +414,7 @@ void loop() {
     lcd.write("st");
 
     // while loop for setting up the target position
-    while( autoManual == true && digitalRead(startnextButtonPin)==HIGH ) {
+    while( manualMode == true && digitalRead(startnextButtonPin)==HIGH ) {
       lcd.setCursor(11, 0);
       lcd.print(position_target);
       lcd.write(' ');  // Clear extra characters
@@ -427,7 +428,7 @@ void loop() {
           button_speed=1;
         }
         if(millis() - button_time > INITDELAY) {
-          button_speed=button_speed_factor;
+          button_speed=coarse_button_incr;
         }
         position_target += button_speed*position_incr;  // Increase 
         // check if this will be a problem
@@ -446,7 +447,7 @@ void loop() {
           button_speed=1;
         }
         if(millis() - button_time > INITDELAY) {
-          button_speed=button_speed_factor;
+          button_speed=coarse_button_incr;
         }
         position_target -= button_speed*position_incr;  // Decrease 
         // check if this will be a problem
@@ -460,7 +461,7 @@ void loop() {
 
 
       // Check for mode change
-      autoManual = !digitalRead(autoManualPin);
+      manualMode = !digitalRead(manualModePin);
       // Check for reset
       if(digitalRead(stopresetButtonPin) == LOW) 
         resetval=resetHandler(stopresetButtonPin);
@@ -473,7 +474,7 @@ void loop() {
     } // end manual position selection loop
 
     // If we are still in manual mode and position_target is different from current position:
-    if (autoManual == true && position_target != position) {
+    if (manualMode == true && position_target != position) {
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print("Tgt:");
@@ -540,7 +541,7 @@ void loop() {
   } // end of manual segment
 
 
-  if (autoManual == false) {  // Auto mode: switch open
+  if (manualMode == false) {  // Auto mode: switch open
 
     lcd.clear();
     lcd.setCursor(0, 0);
@@ -562,7 +563,9 @@ void loop() {
     lcd.print(stepCounter);
     lcd.write("st");
     position_target=positionRound(autoscan_Start);
+
     // do while loop for setting up autoscan_Start
+    button_speed=coarse_button_incr;
     do {
       lcd.setCursor(10, 0);
       lcd.print(position_target);
@@ -584,14 +587,16 @@ void loop() {
         }
       }
       // Check for mode change
-      autoManual = !digitalRead(autoManualPin);
-      if (autoManual == true) { // user switched to manual
+      manualMode = !digitalRead(manualModePin);
+      if (manualMode == true) { // user switched to manual
         goto bailout;
       }
     } while (digitalRead(startnextButtonPin) == HIGH);
     autoscan_Start=position_target;
+    button_speed=1;
 
     // set autoscan_End
+    button_speed=coarse_button_incr;
     if(autoscan_End>autoscan_Start){
        autoscan_End=autoscan_Start;
     }
@@ -630,12 +635,13 @@ void loop() {
         }
       }
       // Check for mode change
-      autoManual = !digitalRead(autoManualPin);
-      if (autoManual == true) { // user switched to manual
+      manualMode = !digitalRead(manualModePin);
+      if (manualMode == true) { // user switched to manual
         goto bailout;
       }
     } while (digitalRead(startnextButtonPin) == HIGH);
     autoscan_End=position_target;
+    button_speed=1;
        
     // set Auto mode speed
     lcd.clear();
@@ -644,9 +650,8 @@ void loop() {
     //lcd.print(autoscan_Speed);
     //lcd.print(" nm/min");
     lcd.write(" ");
-   
 
-    do {
+    do { // auto mode speed selection loop
       lcd.setCursor(6,0);
       lcd.print(autoscan_Speed);
       lcd.print(" nm/min");
@@ -667,18 +672,52 @@ void loop() {
         }
       }
       // check for mode change
-      autoManual=!digitalRead(autoManualPin);
-      if (autoManual==true){
+      manualMode=!digitalRead(manualModePin);
+      if (manualMode==true){
+        goto bailout;
+      }
+    } while (digitalRead(startnextButtonPin)==HIGH);
+
+    // set Auto mode cycles
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("# of cycles:");
+    //lcd.print(autoscan_Speed);
+    //lcd.print(" nm/min");
+    lcd.write(" ");
+
+    do { // auto mode cycles selection loop
+      lcd.setCursor(12,0);
+      lcd.print(autoscan_Cycles);
+      delay(HOLDOFF);
+      
+      // adjust speed with up and down buttons
+      if (digitalRead(upButtonPin)==LOW){
+        autoscan_Cycles+=1; //increase speed
+        if(autoscan_Cycles > 10){
+          autoscan_Cycles-=1; //undo if over max speed
+        }
+      }
+      if(digitalRead(downButtonPin)==LOW){
+        autoscan_Cycles-=1; // decrease speed
+        if (autoscan_Cycles < 1){;
+          autoscan_Cycles+=1; //undo if below min speed
+        }
+      }
+      // check for mode change
+      manualMode=!digitalRead(manualModePin);
+      if (manualMode==true){
         goto bailout;
       }
     } while (digitalRead(startnextButtonPin)==HIGH);
 
     // Calculate extra delay (slow_us) to match the selected speed in nm/min. c1 is from calibration
     slow_us=(long)max((1000000.0 / (((double)autoscan_Speed / 60) * abs(c1))) - (2.0 * (double)stepInterval), 0); 
+ 
     // Ensures total step time (2 * stepInterval + slow_us) aligns with user-defined speed.
 
     // Main auto loop: waits for user to press start and then runs scan
-    while (autoManual == false) {  // Main loop
+    while (manualMode == false) {  // Main loop
       // move to start
       steps_target=positionSteps(autoscan_Start);
       if (steps_target > stepCounter) {  // move forward
@@ -688,7 +727,8 @@ void loop() {
           digitalWrite(stepPin, HIGH);
           delayMicroseconds(stepInterval);
           digitalWrite(stepPin, LOW);
-          delayMicroseconds(stepInterval); // move to start position at max speed
+          delayMicroseconds(stepInterval); 
+          // move to start position at max speed
           stepCounter++;
           // display current position: leaving option to not do this every step in case that makes it too slow
           if(stepCounter % 8 == 0) {
@@ -722,9 +762,10 @@ void loop() {
             break;  
         } while (stepCounter > steps_target);
         applyBacklashCorrection();
-      }
+      } // done moving to start
+
+      // Ready: Wait for user to press start
       position = stepsPosition(stepCounter);
-      // Alert user to press start
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print("Rdy:");
@@ -740,8 +781,8 @@ void loop() {
       lcd.write("st");
       delay(STARTDELAY); // waiting to make sure previous "start/next" button press has cleared
       while(digitalRead(startnextButtonPin)==HIGH && digitalRead(stopresetButtonPin)==HIGH){
-        autoManual = !digitalRead(autoManualPin);
-        if (autoManual == true) { // user switched to manual
+        manualMode = !digitalRead(manualModePin);
+        if (manualMode == true) { // user switched to manual
           goto bailout;
         }
       }
@@ -750,6 +791,7 @@ void loop() {
       while(cycles_completed<autoscan_Cycles && digitalRead(stopresetButtonPin)==HIGH){ // Scan loop
         // move forward, turn on LED / start signal
         steps_target=positionSteps(autoscan_End);
+        slow_us=(long)max((1000000.0 / (((double)autoscan_Speed / 60) * abs(c1))) - (2.0 * (double)stepInterval), 0); 
         digitalWrite(ledPin,HIGH);
         digitalWrite(dirPin, CLOCKWISE);
         do {
@@ -798,8 +840,8 @@ void loop() {
         applyBacklashCorrection();
         cycles_completed++;
         // Check for mode change
-        autoManual = !digitalRead(autoManualPin);
-        if (autoManual == true) { // user switched to manual
+        manualMode = !digitalRead(manualModePin);
+        if (manualMode == true) { // user switched to manual
           goto bailout;
         }
       } // close auto scan loop: start next scan
