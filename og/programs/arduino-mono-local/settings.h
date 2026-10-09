@@ -1,6 +1,6 @@
 // select instrument
-//#define VIS
-#define NIR
+#define VIS
+//#define NIR
 
 // ******** ADJUST HERE FOR INSTRUMENT-SPECIFIC CALIBRATION ***************
 #ifdef VIS
