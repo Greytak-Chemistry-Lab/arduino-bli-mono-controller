@@ -26,6 +26,7 @@
 // variation/version = og  (current/development version)
 
 #include <LiquidCrystal.h>
+#include "settings.h"
 
 // Define pin numbers for LCD display
 const int lcdRSPin = 2;
@@ -62,8 +63,6 @@ const int M2 = 12;
 // Motor settings
 const long stepsPerRevolution = 1600;  // 1/8 microstepping
 // Each step takes at least 2*stepInterval microseconds
-// stepInterval in us: 1000000 / (2*nm_per_min*8/60) with c1=(-)8
-unsigned long stepInterval = 4000;  // 4000 microseconds half-period for 125 steps per second
 const long backlashSteps = 10;
 const long steps_Min = backlashSteps;
 const long steps_Max = long(8.75 * stepsPerRevolution);  // SET APPROPRIATELY TO AVOID CRASH
@@ -77,35 +76,40 @@ const long steps_Max = long(8.75 * stepsPerRevolution);  // SET APPROPRIATELY TO
 
 // ******** ADJUST HERE FOR INSTRUMENT-SPECIFIC CALIBRATION ***************
 // Polynomial constants to convert nm position to steps, from calibration
-float c0 = 0;
+float c0 = C0;
 // change c1 to -16 since increasing steps leads to shorter wavelength position
-float c1 = -16;  // visible: 16 steps per nm. 125 steps per second. So 7.8125 nm/s scanning
-float c2 = 0;
-float c3 = 0;
+float c1 = C1;  // visible: 16 steps per nm. 125 steps per second. So 7.8125 nm/s scanning
+float c2 = C2;
+float c3 = C3;
+
+// speed selection
+// stepInterval in us: 1000000 / (2*nm_per_min*8/60) with c1=(-)8
+unsigned long stepInterval = STEPINTERVAL;  // 4000 microseconds half-period for 125 steps per second
+long speed_nm_min=0; // selected speed in nm/min
+long slow_us=0;   // delay based on speed
+const long speed_Min=SPEEDMIN; // minimum speed, nm/min: slower than 240 incompatible with current delay scheme
+const long speed_Max=SPEEDMAX; // Speed max, nm/min, max=420 for stepInterval=4000
+const long speed_incr=SPEEDINCR; // multiple of 60
+long autoscan_speed=0; //initialize autoscan speed 
+const int coarse_button_incr=COARSEBUTTONINCR; // for faster scrolling (manual) and setting auto endpoints
 
 // Wavelength configuration and counters
-const long steps_offset = 8984;   // Offset after homing
+const long steps_offset = STEPSOFFSET;   // Offset after homing
 long stepCounter = 0;            // Tracks current step position from home
-const long startPosition = 546;  // Start position in nm (green mercury line)
+const long startPosition = STARTPOSITION;  // Start position in nm (green mercury line)
 long position;                   // current position in nm
-const long position_Max = 1000;  // longest wavelength allowed
-const long position_Min = 240;   // shortest wavelength allowed
-const int position_incr = 1; // increment for position selection button presses 
+const long position_Max = POSITIONMAX;  // longest wavelength allowed
+const long position_Min = POSITIONMIN;   // shortest wavelength allowed
+const int  position_incr= POSITIONINCR; // increment for position selection button presses 
+// ******** END INSTRUMENT-SPECIFIC CALIBRATION ***************
+
+
+
+// Additional global variable initialization
 long autoscan_Start,autoscan_End,autoscan_Speed,autoscan_Cycles; // need these to be global so they don't get lost switching auto/manual
 bool isFirstStart = true;  // Flag to indicate we are on very first start
 bool hardReset = true; // Flag to indicate that scan parameters should be set to default on setup() or next start of loop
 bool isHomed = false;      // flag to indicate homing is not done yet
-
-
-// speed selection
-long speed_nm_min=0; // selected speed in nm/min
-long slow_us=0;   // delay based on speed
-const long speed_Min=240; // minimum speed, nm/min: slower than 240 incompatible with current delay scheme
-const long speed_Max=420; // Speed max, nm/min, max=420 for stepInterval=4000
-const long speed_incr=60; // multiple of 60
-long autoscan_speed=0; //initialize autoscan speed 
-const int coarse_button_incr=10; // for faster scrolling when button held down
-
 
 // Initialize LCD
 LiquidCrystal lcd(lcdRSPin, lcdEPin, lcdD4Pin, lcdD5Pin, lcdD6Pin, lcdD7Pin);
