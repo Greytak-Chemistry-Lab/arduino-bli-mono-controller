@@ -12,8 +12,9 @@
 // or flexible control via elapsed time. 
 // The range of accessible speeds can be adjusted via  microstepping settings for the DRV8825,
 // and different monochromators could be accommodated via wavelength calibrations.
-// The code enables replicate scans in auto mode, but the user interface step to specify the
-// number of scans has not yet been added.
+// The code enables replicate scans in auto mode.
+// We believe the error handling here is a good example for other projects.
+// Enables rapid scrolling of the target position when UP or DOWN is held down.
 // Homing on startup is currently optional, but is strongly advised for actual use because 
 // position limits are not monitored in hardware after the initial homing step.
 // Made by Abdulla Shaker and Andrew Greytak. Update this repo for latest information.
@@ -75,15 +76,16 @@ const long steps_Max = long(8.75 * stepsPerRevolution);  // SET APPROPRIATELY TO
 #define COUNTERCLOCKWISE 0
 
 // ******** ADJUST HERE FOR INSTRUMENT-SPECIFIC CALIBRATION ***************
+// Do not actually adjust here: Set via macros specified in settings.h
 // Polynomial constants to convert nm position to steps, from calibration
 float c0 = C0;
-// change c1 to -16 since increasing steps leads to shorter wavelength position
-float c1 = C1;  // visible: 16 steps per nm. 125 steps per second. So 7.8125 nm/s scanning
+// currently only c1 is needed: negative since increasing steps leads to shorter wavelength position
+float c1 = C1;   
 float c2 = C2;
 float c3 = C3;
 
 // speed selection
-// stepInterval in us: 1000000 / (2*nm_per_min*8/60) with c1=(-)8
+// stepInterval in us: ex: 1000000 / (2*nm_per_min*8/60) with c1=(-)8
 unsigned long stepInterval = STEPINTERVAL;  // 4000 microseconds half-period for 125 steps per second
 long speed_nm_min=0; // selected speed in nm/min
 long slow_us=0;   // delay based on speed
@@ -91,7 +93,7 @@ const long speed_Min=SPEEDMIN; // minimum speed, nm/min: slower than 240 incompa
 const long speed_Max=SPEEDMAX; // Speed max, nm/min, max=420 for stepInterval=4000
 const long speed_incr=SPEEDINCR; // multiple of 60
 long autoscan_speed=0; //initialize autoscan speed 
-const int coarse_button_incr=COARSEBUTTONINCR; // for faster scrolling (manual) and setting auto endpoints
+const int coarse_button_incr=COARSEBUTTONINCR; // multiplier for faster scrolling (manual) and setting auto endpoints
 
 // Wavelength configuration and counters
 const long steps_offset = STEPSOFFSET;   // Offset after homing
